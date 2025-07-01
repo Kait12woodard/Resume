@@ -1,4 +1,5 @@
 <template>
+  <ScrollCharacter />
   <h1 class="text-3xl font-bold my-8">About Me</h1>
 
   <section class="about-me space-y-16">
@@ -81,6 +82,7 @@ import subway      from '@/assets/subway.PNG';
 import carhartt    from '@/assets/carhartt.jpg';
 import supervisor  from '@/assets/supervisor-carhartt.jpg';
 import wouPhoto    from '@/assets/wou-photo.jpg';
+import ScrollCharacter from '@/components/ScrollCharacter.vue'
 </script>
 
 <style scoped>
