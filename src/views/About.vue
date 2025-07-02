@@ -72,6 +72,8 @@
         a great story through the code I write.
       </p>
     </div>
+    <br />
+    <br />
   </section>
 </template>
 
