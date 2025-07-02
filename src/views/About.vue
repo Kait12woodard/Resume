@@ -4,7 +4,6 @@
   <img :src="house" alt="House" id="house-photo" />
 
   <section class="about-me space-y-16">
-
     <div class="story-block left">
       <p>
         My journey into software engineering hasn't followed a straight line — but it's that winding
@@ -23,7 +22,15 @@
       </p>
     </div>
 
-    <img :src="subway" alt="Sandwich Artist" id="subway-photo" />
+<div class="subway-wrap">
+  <img
+    :src="subway"
+    alt="Sandwich Artist"
+    id="subway-photo"
+    @click="sandwichRef?.trigger()"
+  />
+  <SandwichAnimation ref="sandwichRef" />
+</div>
 
     <div class="story-block left">
       <p>
@@ -77,23 +84,27 @@
 </template>
 
 <script setup>
-import gradphoto   from '@/assets/gradphoto.jpeg';
-import swishLine   from '@/assets/swish-line.svg';
-import subway      from '@/assets/subway.PNG';
-import carhartt    from '@/assets/carhartt.jpg';
-import supervisor  from '@/assets/supervisor-carhartt.jpg';
-import wouPhoto    from '@/assets/wou-photo.jpg';
-import house from '@/assets/house.png';
-import open_house from '@/assets/open_house.png';
+import { ref } from 'vue'
+import gradphoto from '@/assets/gradphoto.jpeg'
+import subway from '@/assets/subway.PNG'
+import carhartt from '@/assets/carhartt.jpg'
+import supervisor from '@/assets/supervisor-carhartt.jpg'
+import wouPhoto from '@/assets/wou-photo.jpg'
+import house from '@/assets/house.png'
+import open_house from '@/assets/open_house.png'
+import swishLine from '@/assets/swish-line.svg'
 import ScrollCharacter from '@/components/ScrollCharacter.vue'
+import SandwichAnimation from '@/components/SandwichAnimation.vue'
+
+const sandwichRef = ref(null)
 </script>
 
 <style scoped>
-#house-photo{
-  width:200px;          
-  height:auto;          
-  display:block;
-  margin:0 auto 16px;   
+#house-photo {
+  width: 200px;
+  height: auto;
+  display: block;
+  margin: 0 auto 16px;
 }
 
 #grad-photo,
@@ -102,7 +113,7 @@ import ScrollCharacter from '@/components/ScrollCharacter.vue'
   height: 300px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 4px 6px rgba(0,0,0,.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 5px solid black;
   align-self: flex-end;
   margin-left: auto;
@@ -114,18 +125,19 @@ import ScrollCharacter from '@/components/ScrollCharacter.vue'
   height: 300px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 4px 6px rgba(0,0,0,.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 5px solid black;
   align-self: flex-start;
   margin-right: auto;
   transform: scaleX(-1);
+  cursor: pointer;
 }
 
 #wou-photo {
   width: 600px;
   height: 400px;
   object-fit: cover;
-  box-shadow: 0 4px 6px rgba(0,0,0,.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 5px solid black;
   align-self: center;
   margin: 0 auto;
@@ -159,4 +171,11 @@ import ScrollCharacter from '@/components/ScrollCharacter.vue'
   align-self: center;
   text-align: center;
 }
+
+.subway-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 </style>
