@@ -1,9 +1,9 @@
 <template>
   <ScrollCharacter />
   <h1 class="text-3xl font-bold my-8">About Me</h1>
+  <img :src="house" alt="House" id="house-photo" />
 
   <section class="about-me space-y-16">
-    <img :src="swishLine" alt="" class="swish-line swish-top" />
 
     <div class="story-block left">
       <p>
@@ -36,7 +36,6 @@
     </div>
 
     <img :src="carhartt" alt="Carhartt" id="carhartt-photo" />
-    <img :src="swishLine" alt="" class="swish-line swish-bottom" />
 
     <div class="story-block right">
       <p>
@@ -84,10 +83,19 @@ import subway      from '@/assets/subway.PNG';
 import carhartt    from '@/assets/carhartt.jpg';
 import supervisor  from '@/assets/supervisor-carhartt.jpg';
 import wouPhoto    from '@/assets/wou-photo.jpg';
+import house from '@/assets/house.png';
+import open_house from '@/assets/open_house.png';
 import ScrollCharacter from '@/components/ScrollCharacter.vue'
 </script>
 
 <style scoped>
+#house-photo{
+  width:200px;          
+  height:auto;          
+  display:block;
+  margin:0 auto 16px;   
+}
+
 #grad-photo,
 #carhartt-photo {
   width: 300px;
@@ -121,26 +129,6 @@ import ScrollCharacter from '@/components/ScrollCharacter.vue'
   border: 5px solid black;
   align-self: center;
   margin: 0 auto;
-}
-
-.swish-line {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 2000px;
-  height: auto;
-  pointer-events: none;
-  opacity: 0.4;
-  z-index: 0;
-}
-
-.swish-top {
-  top: 0;
-}
-
-.swish-bottom {
-  top: 1800px;
-  transform: translate(-50%);
 }
 
 .about-me {
