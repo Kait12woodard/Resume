@@ -1,13 +1,14 @@
 <template>
   <ScrollCharacter />
+
   <h1 class="text-3xl font-bold my-8">About Me</h1>
   <img :src="house" alt="House" id="house-photo" />
 
   <section class="about-me space-y-16">
     <div class="story-block left">
       <p>
-        My journey into software engineering hasn't followed a straight line — but it's that winding
-        trail that's shaped me into a curious, adaptable, and driven developer.
+        My journey into software engineering hasn't followed a straight line — but it's that
+        winding trail that's shaped me into a curious, adaptable, and driven developer.
       </p>
     </div>
 
@@ -15,10 +16,10 @@
 
     <div class="story-block right">
       <p>
-        Right out of high school, I jumped into both work and college. I started as a Sandwich Artist
-        at Subway while attending Portland Community College full-time. I quickly moved into a Shift
-        Lead role, taking on more responsibility and discovering how much I enjoyed solving problems
-        and helping a team grow.
+        Right out of high school, I jumped into both work and college. I started as a Sandwich
+        Artist at Subway while attending Portland Community College full-time. I quickly moved
+        into a Shift Lead role, taking on more responsibility and discovering how much I enjoyed
+        solving problems and helping a team grow.
       </p>
     </div>
 
@@ -34,11 +35,11 @@
 
     <div class="story-block left">
       <p>
-        At PCC, I focused on general studies while exploring a variety of subjects to find my direction.
-        When I relocated to the Salem area, I joined Carhartt as a Brand Ambassador. After finishing
-        my associate's degree, I continued growing professionally and eventually worked my way up to
-        Supervisor. That role gave me the opportunity to develop real leadership skills — from team
-        communication to problem-solving under pressure.
+        At PCC, I focused on general studies while exploring a variety of subjects to find my
+        direction. When I relocated to the Salem area, I joined Carhartt as a Brand Ambassador.
+        After finishing my associate's degree, I continued growing professionally and eventually
+        worked my way up to Supervisor. That role gave me the opportunity to develop real
+        leadership skills — from team communication to problem-solving under pressure.
       </p>
     </div>
 
@@ -60,9 +61,9 @@
     <div class="story-block right">
       <p>
         It was during this time that I became “the techy one” at our store — the person everyone
-        turned to for troubleshooting software, submitting IT tickets, and making sense of the tools
-        we relied on. That experience sparked something deeper: a desire to understand not just how
-        the systems worked, but how they could be improved.
+        turned to for troubleshooting software, submitting IT tickets, and making sense of the
+        tools we relied on. That experience sparked something deeper: a desire to understand not
+        just how the systems worked, but how they could be improved.
       </p>
     </div>
 
@@ -70,14 +71,10 @@
 
     <div class="story-block left">
       <p>
-        So I made the leap and enrolled at Western Oregon University to pursue a Bachelor's degree
-        in Computer Science. Over the course of three years, I gained hands-on experience with
-        full-stack development and deepened my understanding of how software is built from the ground
-        up. For a few months during that time, I also worked as a research assistant for a CS professor,
-        where I explored AI tools and created educational videos to support student learning — a unique
-        project that expanded both my technical and creative skill sets. During this transition, I was
-        fortunate to be supported by my husband, which allowed me to fully focus on my education and
-        growth. That time gave me the space I needed to invest in becoming the engineer I am today.
+        I enrolled at Western Oregon University for a Bachelor's in Computer Science. Over three
+        years I gained hands-on full-stack experience, and even worked as a research assistant
+        creating AI-driven educational videos. With my husband’s support, I could fully focus on
+        learning and growth.
       </p>
     </div>
 
@@ -86,13 +83,11 @@
     <div class="story-block center">
       <p>
         Now, I'm excited to bring my background in leadership, user experience, and full-stack
-        development into the software industry. Whether working on front-end interfaces or
-        back-end systems, I'm passionate about building thoughtful, resilient tools — and telling
-        a great story through the code I write.
+        development into the software industry. Whether front-end or back-end, I'm passionate about
+        building thoughtful, resilient tools — and telling a great story through the code I write.
       </p>
     </div>
-    <br />
-    <br />
+    <br /><br />
   </section>
 </template>
 
@@ -104,9 +99,6 @@ import carhartt from '@/assets/carhartt.jpg'
 import supervisor from '@/assets/supervisor-carhartt.jpg'
 import wouPhoto from '@/assets/wou-photo.jpg'
 import house from '@/assets/house.png'
-import open_house from '@/assets/open_house.png'
-import fancy1 from '@/assets/character/fancy1.png'
-import fancy2 from '@/assets/character/fancy2.png'
 import ScrollCharacter from '@/components/ScrollCharacter.vue'
 import SandwichAnimation from '@/components/SandwichAnimation.vue'
 import CharacterWalkAnimation from '@/components/CharacterWalkAnimation.vue'
@@ -115,6 +107,13 @@ const sandwichRef = ref(null)
 const carharttRef = ref(null)
 const carharttPlaying = ref(false)
 </script>
+
+<style>
+body {
+  margin: 0;
+  background: linear-gradient(to bottom, #3b82f6 0%, #3ba76f 100%);
+}
+</style>
 
 <style scoped>
 #house-photo {
@@ -136,6 +135,7 @@ const carharttPlaying = ref(false)
   margin-left: auto;
   z-index: 2;
   position: relative;
+  transition: box-shadow 0.3s ease;
 }
 
 #subway-photo,
@@ -150,6 +150,12 @@ const carharttPlaying = ref(false)
   margin-right: auto;
   transform: scaleX(-1);
   cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+#subway-photo:hover,
+#carhartt-photo:hover {
+  box-shadow: 0 0 30px 15px rgba(0, 191, 255, 0.9);
 }
 
 #carhartt-photo.disabled {
