@@ -22,15 +22,15 @@
       </p>
     </div>
 
-<div class="subway-wrap">
-  <img
-    :src="subway"
-    alt="Sandwich Artist"
-    id="subway-photo"
-    @click="sandwichRef?.trigger()"
-  />
-  <SandwichAnimation ref="sandwichRef" />
-</div>
+    <div class="subway-wrap">
+      <img
+        :src="subway"
+        alt="Sandwich Artist"
+        id="subway-photo"
+        @click="sandwichRef?.trigger()"
+      />
+      <SandwichAnimation ref="sandwichRef" />
+    </div>
 
     <div class="story-block left">
       <p>
@@ -42,7 +42,20 @@
       </p>
     </div>
 
-    <img :src="carhartt" alt="Carhartt" id="carhartt-photo" />
+    <div class="carhartt-wrap">
+      <img
+        :src="carhartt"
+        alt="Carhartt"
+        id="carhartt-photo"
+        :class="{ disabled: carharttPlaying }"
+        @click="carharttPlaying ? null : carharttRef?.trigger()"
+      />
+      <CharacterWalkAnimation
+        ref="carharttRef"
+        @started="carharttPlaying = true"
+        @ended="carharttPlaying = false"
+      />
+    </div>
 
     <div class="story-block right">
       <p>
@@ -92,11 +105,15 @@ import supervisor from '@/assets/supervisor-carhartt.jpg'
 import wouPhoto from '@/assets/wou-photo.jpg'
 import house from '@/assets/house.png'
 import open_house from '@/assets/open_house.png'
-import swishLine from '@/assets/swish-line.svg'
+import fancy1 from '@/assets/character/fancy1.png'
+import fancy2 from '@/assets/character/fancy2.png'
 import ScrollCharacter from '@/components/ScrollCharacter.vue'
 import SandwichAnimation from '@/components/SandwichAnimation.vue'
+import CharacterWalkAnimation from '@/components/CharacterWalkAnimation.vue'
 
 const sandwichRef = ref(null)
+const carharttRef = ref(null)
+const carharttPlaying = ref(false)
 </script>
 
 <style scoped>
@@ -131,6 +148,11 @@ const sandwichRef = ref(null)
   margin-right: auto;
   transform: scaleX(-1);
   cursor: pointer;
+}
+
+#carhartt-photo.disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }
 
 #wou-photo {
@@ -172,10 +194,10 @@ const sandwichRef = ref(null)
   text-align: center;
 }
 
-.subway-wrap {
+.subway-wrap,
+.carhartt-wrap {
   position: relative;
   display: flex;
   align-items: center;
 }
-
 </style>
