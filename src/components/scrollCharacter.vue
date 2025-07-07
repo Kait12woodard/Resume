@@ -15,14 +15,25 @@ import running1 from '@/assets/character/running1.png'
 import running2 from '@/assets/character/running2.png'
 
 const W = 100, H = 150, M = 20, IN = 60, CYC = 3, SAMP = 200
-const FRAME = 200, IDLE = 800, FLIP = 0.5
+const FRAME = 200, IDLE = 3500, FLIP = 0.5
 const ease = t => Math.pow(t, 0.7)
 
-const src = ref(hipPose), left = ref(0), top = ref(0), face = ref('left')
-const pathD = ref(''), svgW = ref(0), svgH = ref(0)
+const src = ref(hipPose)
+const left = ref(0)
+const top = ref(0)
+const face = ref('left')
+const pathD = ref('')
+const svgW = ref(0)
+const svgH = ref(0)
 
-let run = false, togg = false, raf = 0, lastFrame = 0, lastScroll = 0
-let startY = 0, travelY = 0, lastX = 0
+let running = false
+let togg = false
+let raf = 0
+let lastFrame = 0
+let startY = 0
+let travelY = 0
+let lastX = 0
+let idleTimer = null
 
 function frameLoop(now) {
   if (now - lastFrame >= FRAME) {
@@ -30,34 +41,40 @@ function frameLoop(now) {
     togg = !togg
     lastFrame = now
   }
-  if (run) raf = requestAnimationFrame(frameLoop)
+  if (running) raf = requestAnimationFrame(frameLoop)
 }
 
-function start() {
-  lastScroll = performance.now()
-  if (run) return
-  run = true
+function startFrames() {
+  if (running) return
+  running = true
   togg = false
   src.value = standingPose
-  lastFrame = lastScroll
+  lastFrame = performance.now()
   raf = requestAnimationFrame(frameLoop)
 }
 
-function idleCheck() {
-  if (run && performance.now() - lastScroll > IDLE) {
-    run = false
-    cancelAnimationFrame(raf)
+function stopFrames() {
+  running = false
+  cancelAnimationFrame(raf)
+  src.value = hipPose
+}
+
+function resetIdleTimer() {
+  clearTimeout(idleTimer)
+  idleTimer = setTimeout(() => {
     src.value = standingPose
-    setTimeout(() => { if (!run) src.value = hipPose }, 500)
-  }
-  requestAnimationFrame(idleCheck)
+    setTimeout(stopFrames, 500)
+  }, IDLE)
 }
 
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && run) {
+  if (document.hidden) {
     cancelAnimationFrame(raf)
-    lastFrame = performance.now()
-    raf = requestAnimationFrame(frameLoop)
+  } else {
+    if (running) {
+      lastFrame = performance.now()
+      raf = requestAnimationFrame(frameLoop)
+    }
   }
 })
 
@@ -68,11 +85,15 @@ function update() {
   const cx = M + IN + waveW / 2
   const amp = waveW / 2
   const x = cx + amp * Math.cos(2 * Math.PI * CYC * t - Math.PI / 2)
+
   left.value = t >= 1 ? cx : Math.round(x)
   if (Math.abs(x - lastX) > FLIP) face.value = x < lastX ? 'left' : 'right'
   lastX = x
+
   top.value = startY + ease(t) * travelY
-  start()
+
+  startFrames()
+  resetIdleTimer()
 }
 
 function setTravel() {
@@ -87,6 +108,7 @@ function buildPath() {
   const amp = waveW / 2
   svgW.value = window.innerWidth
   svgH.value = docH + window.innerHeight
+
   const pts = []
   for (let i = 0; i <= SAMP; i++) {
     const t = i / SAMP
@@ -110,7 +132,6 @@ onMounted(async () => {
   recalcStart()
   const house = document.getElementById('house-photo')
   if (house) house.addEventListener('load', recalcStart, { once: true })
-  requestAnimationFrame(idleCheck)
   window.addEventListener('scroll', update, { passive: true })
   window.addEventListener('resize', recalcStart)
 })
@@ -118,7 +139,8 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener('scroll', update)
   window.removeEventListener('resize', recalcStart)
-  cancelAnimationFrame(raf)
+  clearTimeout(idleTimer)
+  stopFrames()
 })
 </script>
 
@@ -132,15 +154,30 @@ onUnmounted(() => {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  transition: left .12s linear, top .18s linear
+  transition: left 0.12s linear, top 0.18s linear;
 }
 .scroll-character img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  transition: transform .1s
+  transition: transform 0.1s;
 }
-.scroll-character img.flipped { transform: scaleX(-1) }
-.scroll-path { position: absolute; top: 0; left: 0; width: 100%; pointer-events: none; z-index: 5 }
-.walk-line { fill: none; stroke: #555; stroke-width: 8; stroke-dasharray: 6 6; opacity: .4 }
+.flipped {
+  transform: scaleX(-1);
+}
+.scroll-path {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+.walk-line {
+  fill: none;
+  stroke: #555;
+  stroke-width: 8;
+  stroke-dasharray: 6 6;
+  opacity: 0.4;
+}
 </style>

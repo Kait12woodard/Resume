@@ -134,6 +134,8 @@ const carharttPlaying = ref(false)
   border: 5px solid black;
   align-self: flex-end;
   margin-left: auto;
+  z-index: 2;
+  position: relative;
 }
 
 #subway-photo,
@@ -152,7 +154,7 @@ const carharttPlaying = ref(false)
 
 #carhartt-photo.disabled {
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.9;
 }
 
 #wou-photo {

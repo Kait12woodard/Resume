@@ -24,7 +24,7 @@ let resetTimer = null
 let scrollHandler = null
 
 const startLoop = () => {
-  stopLoop()
+  clearInterval(frameTimer)
   frameTimer = setInterval(() => {
     currentFrame.value = currentFrame.value === fancy1 ? fancy2 : fancy1
   }, 200)
@@ -34,10 +34,8 @@ const stopLoop = () => {
   frameTimer = null
 }
 const detachScroll = () => {
-  if (scrollHandler) {
-    window.removeEventListener('scroll', scrollHandler)
-    scrollHandler = null
-  }
+  if (scrollHandler) window.removeEventListener('scroll', scrollHandler)
+  scrollHandler = null
 }
 const reset = () => {
   tl?.kill()
@@ -71,22 +69,14 @@ const trigger = async () => {
 
   const updateY = () => {
     const rect = anchor.getBoundingClientRect()
-    const y = rect.top + rect.height / 2 - el.offsetHeight / 2
-    gsap.set(el, { top: y })
+    gsap.set(el, { top: rect.top + rect.height / 2 - el.offsetHeight / 2 })
   }
 
   const rect = anchor.getBoundingClientRect()
-  const startX = rect.left - el.offsetWidth - 20
-  const stopX = 300
+  const startX = rect.left - el.offsetWidth + 250
+  const stopX = 380
 
-  gsap.set(el, {
-    position: 'fixed',
-    top: rect.top,
-    left: startX,
-    scaleX: 1,
-    opacity: 0
-  })
-
+  gsap.set(el, { position: 'fixed', left: startX, scaleX: 1 })
   updateY()
   scrollHandler = updateY
   window.addEventListener('scroll', scrollHandler, { passive: true })
@@ -94,7 +84,6 @@ const trigger = async () => {
   startLoop()
 
   tl = gsap.timeline({ onComplete: reset })
-    .to(el, { opacity: 1, duration: 0.4 })
     .to(el, { left: stopX, duration: 2, ease: 'none' })
     .add(() => { stopLoop(); currentFrame.value = fancy3 })
     .to({}, { duration: 0.5 })
@@ -104,15 +93,15 @@ const trigger = async () => {
     .to({}, { duration: 0.5 })
     .add(() => { currentFrame.value = fancy4 })
     .to({}, { duration: 0.5 })
-    .add(() => {
-      currentFrame.value = fancy1
-      gsap.set(el, { scaleX: -1 })
-      startLoop()
-    })
+    .add(() => { currentFrame.value = fancy1; gsap.set(el, { scaleX: -1 }); startLoop() })
     .to(el, { left: startX, duration: 2, ease: 'none' })
-    .to(el, { opacity: 0, duration: 0.4 })
 
-  resetTimer = setTimeout(reset, 10000)
+  clearTimeout(resetTimer)
+  resetTimer = setTimeout(() => {
+    if (tl && playing.value) {
+      tl.play() // resume timeline if it was paused/throttled
+    }
+  }, 15000)
 }
 
 defineExpose({ trigger })
@@ -124,6 +113,6 @@ onUnmounted(reset)
   width: 150px;
   height: auto;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 1;
 }
 </style>
