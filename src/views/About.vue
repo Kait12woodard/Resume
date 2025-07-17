@@ -111,7 +111,6 @@ const carharttPlaying = ref(false)
 <style>
 body {
   margin: 0;
-  background: linear-gradient(to bottom, #3b82f6 0%, #3ba76f 100%);
 }
 </style>
 
