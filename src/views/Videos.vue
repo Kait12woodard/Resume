@@ -404,6 +404,11 @@ onUnmounted(() => {
   height: 100%;
 }
 
+iframe:hover {
+  border: 10px solid #5475eb;
+  box-shadow: 0 0 30px #5475eb;
+}
+
 .video-text-top {
   padding: 1rem 2rem 0.5rem;
   font-family: "Georgia", serif;
