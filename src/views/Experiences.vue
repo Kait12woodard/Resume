@@ -81,7 +81,7 @@ const cards = [
     ]
   },
   {
-    title: 'Consumer Experience Leader / Brand Ambassador',
+    title: 'Consumer Experience Leader',
     meta: 'May 2017 – Sept 2022 · Carhartt — Keizer, OR',
     sections: [
       {
@@ -103,7 +103,7 @@ const cards = [
     ]
   },
   {
-    title: 'Sandwich Artist / Supervisor',
+    title: 'Supervisor',
     meta: 'Dec 2014 – Mar 2017 · Subway — North Plains, OR',
     sections: [
       {
@@ -124,6 +124,7 @@ const cards = [
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lora:400,400i,700&display=swap');
 
 body {
@@ -142,22 +143,25 @@ body {
 
 .slides {
   position: relative;
-  width: 600px;
-  height: 550px;
+  width: 650px;
+  height: 600px;
 }
 
 .experience-card {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: white;
+  background: linear-gradient(to bottom right, #ffffff, #f9f9fb);
   border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  border: 1px solid #d1d5db;
+  border-left: 6px solid #3b82f6;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   opacity: 0;
   pointer-events: none;
   transform: scale(0.95);
   transition: opacity 0.5s ease, transform 0.5s ease;
+  font-family: 'Inter', sans-serif;
 }
 
 .experience-card.active {
@@ -167,26 +171,35 @@ body {
 }
 
 .experience-card h2 {
-  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  color: #111827;
+  margin-bottom: 0.25rem;
 }
 
 .meta {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.25rem;
   font-style: italic;
-  color: #555;
-  margin-bottom: 1rem;
 }
 
 .details h3 {
-  margin: 1rem 0 0.25rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 1.25rem 0 0.25rem;
 }
 
 .details p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #4b5563;
   margin: 0;
 }
 
 .nav-links {
   list-style: none;
-  padding-left: 0;
+  padding-left: 10;
   margin: 0;
 }
 
@@ -195,20 +208,38 @@ body {
 }
 
 .nav-link {
+  position: relative;
   font-size: 1.25rem;
   font-family: 'Lora', serif;
   text-decoration: none;
-  color: #7f8c8d;
-  transition: color 0.3s;
+  color: #4b5563;
+  transition: all 0.3s ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, #3b82f6, #10b981);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1);
 }
 
 .nav-link:hover {
-  color: #1c1e1f;
+  color: #1f2937;
 }
 
 .nav-link.active {
-  color: black;
-  font-weight: bold;
+  color: #111827;
+  font-weight: 700;
   pointer-events: none;
 }
 </style>

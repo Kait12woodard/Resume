@@ -9,6 +9,9 @@ import NavBar from './components/NavBar.vue'
   </div>
 </template>
 
-<style scoped>
-
+<style>
+  body {
+    margin: 0;
+    background-color: #eef2f6;
+  }
 </style>
