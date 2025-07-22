@@ -242,16 +242,16 @@ onMounted(() => {
   height: 100vh;
   pointer-events: none;
   z-index: 10;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 0, 0.85);
   mask-image: radial-gradient(
-    ellipse 320px 800px at var(--x, 50%) var(--y, 50%),
+    ellipse 340px 800px at var(--x, 50%) var(--y, 50%),
     rgba(0, 0, 0, 0) 5%,
     rgba(0, 0, 0, 0.1) 30%,
     rgba(0, 0, 0, 0.4) 60%,
     rgba(0, 0, 0, 1) 100%
   );
   -webkit-mask-image: radial-gradient(
-    ellipse 320px 800px at var(--x, 50%) var(--y, 50%),
+    ellipse 340px 800px at var(--x, 50%) var(--y, 50%),
     rgba(0, 0, 0, 0) 5%,
     rgba(0, 0, 0, 0.1) 30%,
     rgba(0, 0, 0, 0.4) 60%,
