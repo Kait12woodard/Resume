@@ -7,12 +7,23 @@
         class="experience-card"
         :class="{ active: index === activeIndex }"
       >
-        <h2>{{ card.title }}</h2>
-        <p class="meta">{{ card.meta }}</p>
-        <div class="details">
-          <div v-for="(section, i) in card.sections" :key="i">
-            <h3>{{ section.heading }}</h3>
-            <p>{{ section.text }}</p>
+        <div
+          class="frame-wrapper"
+          :class="{
+            frame1: getFrame(index) === frame1,
+            frame2: getFrame(index) === frame2
+          }"
+          :style="{ backgroundImage: `url(${getFrame(index)})` }"
+        >
+          <div class="content">
+            <h2>{{ card.title }}</h2>
+            <p class="meta">{{ card.meta }}</p>
+            <div class="details">
+              <div v-for="(section, i) in card.sections" :key="i">
+                <h3>{{ section.heading }}</h3>
+                <p>{{ section.text }}</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -32,6 +43,8 @@
 
 <script setup>
 import { ref } from 'vue'
+import frame1 from '@/assets/frame1.png'
+import frame2 from '@/assets/frame2.png'
 
 const activeIndex = ref(0)
 
@@ -121,6 +134,8 @@ const cards = [
     ]
   }
 ]
+
+const getFrame = (index) => (index % 2 === 0 ? frame1 : frame2)
 </script>
 
 <style scoped>
@@ -137,70 +152,94 @@ body {
   justify-content: center;
   align-items: flex-start;
   gap: 4rem;
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 4rem auto;
+  overflow: visible;
 }
 
 .slides {
   position: relative;
-  width: 650px;
-  height: 600px;
+  width: 800px;
+  height: 1000px;
+  overflow: visible;
 }
 
 .experience-card {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom right, #ffffff, #f9f9fb);
-  border-radius: 1rem;
-  padding: 2rem;
-  border: 1px solid #d1d5db;
-  border-left: 6px solid #3b82f6;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
   opacity: 0;
   pointer-events: none;
   transform: scale(0.95);
   transition: opacity 0.5s ease, transform 0.5s ease;
-  font-family: 'Inter', sans-serif;
+  overflow: visible;
 }
 
 .experience-card.active {
   opacity: 1;
   pointer-events: auto;
   transform: scale(1);
+  overflow: visible;
 }
 
-.experience-card h2 {
-  font-size: 1.75rem;
+.frame-wrapper {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 3rem;
+  overflow: visible;
+  position: relative;
+  font-family: 'Inter', sans-serif;
+}
+
+.frame-wrapper > .content {
+  width: 70%;
+  max-height: 90%;
+  overflow-y: auto;
+  padding: 1.5rem 2rem;
+  border-radius: 0.5rem;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.frame-wrapper h2 {
+  font-size: 1.5rem;
   color: #111827;
   margin-bottom: 0.25rem;
 }
 
 .meta {
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: #6b7280;
   margin-bottom: 1.25rem;
   font-style: italic;
 }
 
 .details h3 {
-  font-size: 1.125rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #374151;
-  margin: 1.25rem 0 0.25rem;
+  margin: 1.2rem 0 0.25rem;
 }
 
 .details p {
-  font-size: 0.95rem;
-  line-height: 1.6;
+  font-size: 0.75rem;
+  line-height: 1.5;
   color: #4b5563;
-  margin: 0;
+  margin: 10px 0;
 }
 
 .nav-links {
   list-style: none;
   padding-left: 10;
   margin: 0;
+  padding-top: 8rem;
 }
 
 .nav-links li {
