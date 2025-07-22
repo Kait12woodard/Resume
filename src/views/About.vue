@@ -154,7 +154,7 @@ body {
 
 #subway-photo:hover,
 #carhartt-photo:hover {
-  box-shadow: 0 0 30px 15px rgba(0, 191, 255, 0.9);
+  box-shadow: 0 0 30px 15px #5475eb;
 }
 
 #carhartt-photo.disabled {

@@ -406,7 +406,7 @@ onUnmounted(() => {
 
 iframe:hover {
   border: 10px solid #5475eb;
-  box-shadow: 0 0 30px #5475eb;
+  box-shadow: 0 0 30px 15px #5475eb;
 }
 
 .video-text-top {

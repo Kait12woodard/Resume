@@ -37,7 +37,7 @@ const activeIndex = ref(0)
 
 const cards = [
   {
-    title: 'B.S. in Computer Science',
+    title: 'Computer Science Student',
     meta: '2022 – 2025 · Western Oregon University — Monmouth, OR',
     sections: [
       {
