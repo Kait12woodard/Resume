@@ -1,6 +1,8 @@
 <template>
   <div class="carousel">
     <div class="slides">
+      <img src="@/assets/light-on.png" alt="spotlight" class="spotlight" />
+      <div class="spotlight-overlay"></div>
       <div
         v-for="(card, index) in cards"
         :key="index"
@@ -157,6 +159,42 @@ body {
   overflow: visible;
 }
 
+.spotlight {
+  position: absolute;
+  top: -70px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.spotlight-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2;
+
+  background-color: rgba(0, 0, 0, 0.85);
+  mask-image: radial-gradient(
+    ellipse 400px 850px at var(--x, 40%) var(--y, 70%),
+    rgba(0, 0, 0, 0) 5%,
+    rgba(0, 0, 0, 0.1) 30%,
+    rgba(0, 0, 0, 0.4) 60%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 400px 850px at var(--x, 40%) var(--y, 70%),
+    rgba(0, 0, 0, 0) 5%,
+    rgba(0, 0, 0, 0.1) 30%,
+    rgba(0, 0, 0, 0.4) 60%,
+    rgba(0, 0, 0, 1) 100%
+  );
+}
+
 .slides {
   position: relative;
   width: 800px;
@@ -196,6 +234,7 @@ body {
   overflow: visible;
   position: relative;
   font-family: 'Inter', sans-serif;
+  z-index: 0;
 }
 
 .frame-wrapper > .content {
@@ -206,6 +245,8 @@ body {
   border-radius: 0.5rem;
   text-align: left;
   box-sizing: border-box;
+  position: relative;
+  z-index: 2;
 }
 
 .frame-wrapper h2 {
@@ -240,6 +281,7 @@ body {
   padding-left: 10;
   margin: 0;
   padding-top: 8rem;
+  z-index: 999;
 }
 
 .nav-links li {
@@ -251,8 +293,9 @@ body {
   font-size: 1.25rem;
   font-family: 'Lora', serif;
   text-decoration: none;
-  color: #4b5563;
+  color: #ffffff;
   transition: all 0.3s ease;
+  text-shadow: 0 0 5px #fff, 0 0 5px #10b981;
 }
 
 .nav-link::after {
@@ -272,13 +315,10 @@ body {
   transform: scaleX(1);
 }
 
-.nav-link:hover {
-  color: #1f2937;
-}
-
 .nav-link.active {
-  color: #111827;
+  color: #ffffff;
   font-weight: 700;
+  text-shadow: 0 0 5px #fff, 0 0 10px #10b981, 0 0 20px #10b981;
   pointer-events: none;
 }
 </style>
