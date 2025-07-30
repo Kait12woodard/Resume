@@ -4,7 +4,7 @@
 
     <div class="video-layout-wrapper">
       <div
-        class="video-info-card"
+        class="video-info-card capstone"
         id="capstone-info"
         :class="{ active: activeCard === 'capstone-info' }"
         @click="toggleCard('capstone-info')"
@@ -18,7 +18,7 @@
       </div>
 
       <div
-        class="video-card"
+        class="video-card capstone"
         id="capstone-video"
         :class="{ active: activeCard === 'capstone-video' }"
         @click="toggleCard('capstone-video')"
@@ -35,7 +35,7 @@
       </div>
 
       <div
-        class="video-info-card"
+        class="video-info-card research"
         id="research-info"
         :class="{ active: activeCard === 'research-info' }"
         @click="toggleCard('research-info')"
@@ -49,7 +49,7 @@
       </div>
 
       <div
-        class="video-card"
+        class="video-card research"
         id="research-video"
         :class="{ active: activeCard === 'research-video' }"
         @click="toggleCard('research-video')"
@@ -66,7 +66,7 @@
       </div>
 
       <div
-        class="video-card"
+        class="video-card research"
         id="machine-cycle"
         :class="{ active: activeCard === 'machine-cycle' }"
         @click="toggleCard('machine-cycle')"
@@ -83,7 +83,7 @@
       </div>
 
       <div
-        class="video-card"
+        class="video-card research"
         id="parallelism-video"
         :class="{ active: activeCard === 'parallelism-video' }"
         @click="toggleCard('parallelism-video')"
@@ -100,7 +100,7 @@
       </div>
 
       <div
-        class="video-info-card"
+        class="video-info-card other"
         id="other-info"
         :class="{ active: activeCard === 'other-info' }"
         @click="toggleCard('other-info')"
@@ -114,7 +114,7 @@
       </div>
 
       <div
-        class="video-card"
+        class="video-card other"
         id="prolog-video"
         :class="{ active: activeCard === 'prolog-video' }"
         @click="toggleCard('prolog-video')"
@@ -361,7 +361,7 @@ onUnmounted(() => {
 
 .video-card:hover,
 .video-info-card:hover {
-  transform: scale(1.05);
+  transform: scale(1.15);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
@@ -463,5 +463,18 @@ iframe:hover {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+/* Section-specific border colors */
+.capstone {
+  border-color: #82d6fa;
+}
+
+.research {
+  border-color: #a4e682;
+}
+
+.other {
+  border-color: #f9c282;
 }
 </style>
