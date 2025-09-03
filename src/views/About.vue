@@ -24,12 +24,43 @@
     </div>
 
     <div class="subway-wrap">
-      <img
-        :src="subway"
-        alt="Sandwich Artist"
-        id="subway-photo"
-        @click="sandwichRef?.trigger()"
-      />
+      <div class="circle-figure" ref="subwayFigure">
+        <img
+          :src="subway"
+          alt="Sandwich Artist"
+          id="subway-photo"
+          ref="subwayImg"
+          @click="sandwichRef?.trigger()"
+        />
+        <svg
+          class="border-tag"
+          :viewBox="`0 0 ${subBox} ${subBox}`"
+          :style="`position:absolute;left:50%;top:50%;width:${subBox}px;height:${subBox}px;transform:translate(-50%,-50%);pointer-events:none;overflow:visible;`"
+          aria-hidden="true"
+        >
+          <defs>
+            <circle
+              :id="subPathId"
+              :cx="subBox/2"
+              :cy="subBox/2"
+              :r="subRadius"
+              pathLength="1000"
+            />
+            <path :id="subTextId" :d="subTextD" />
+          </defs>
+
+          <use
+            :href="`#${subPathId}`"
+            class="border-arc"
+            :style="`stroke-dasharray:${subDash} 1000; stroke-dashoffset:${subOffset}`"
+          />
+
+          <text class="border-text">
+            <textPath :href="`#${subTextId}`" :xlink:href="`#${subTextId}`" 
+            startOffset="50%" text-anchor="middle">Click Me</textPath>
+          </text>
+        </svg>
+      </div>
       <SandwichAnimation ref="sandwichRef" />
     </div>
 
@@ -51,6 +82,7 @@
         :class="{ disabled: carharttPlaying }"
         @click="carharttPlaying ? null : carharttRef?.trigger()"
       />
+      <span v-if="!carharttPlaying" class="click-me">Click Me</span>
       <CharacterWalkAnimation
         ref="carharttRef"
         @started="carharttPlaying = true"
@@ -92,7 +124,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import gradphoto from '@/assets/gradphoto.jpeg'
 import subway from '@/assets/subway.PNG'
 import carhartt from '@/assets/carhartt.jpg'
@@ -106,6 +138,78 @@ import CharacterWalkAnimation from '@/components/CharacterWalkAnimation.vue'
 const sandwichRef = ref(null)
 const carharttRef = ref(null)
 const carharttPlaying = ref(false)
+
+const subwayFigure = ref(null)
+const subwayImg = ref(null)
+
+const subPathId = `subCircle-${Math.random().toString(36).slice(2)}`
+const subTextId = `subText-${Math.random().toString(36).slice(2)}`
+const subBox = ref(0)
+const subRadius = ref(0)
+const subDash = ref(0)
+const subOffset = ref(0)
+const subTextStart = ref(0)
+const subTextD = ref('')
+const subCenterPct = ref('50%')
+
+const strokeW = 28
+const pad = 12
+const textInset = ref(8)
+const textAngleOffset = ref(0)
+
+function arcD(cx, cy, R, a0, a1) {
+  const large = Math.abs(a1 - a0) > Math.PI ? 1 : 0
+  const x0 = cx + R * Math.cos(a0)
+  const y0 = cy + R * Math.sin(a0)
+  const x1 = cx + R * Math.cos(a1)
+  const y1 = cy + R * Math.sin(a1)
+  return `M ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1}`
+}
+
+function updateBorderTag(angleDeg = 220, spanDeg = 40, gapPx = -5) {
+  const img = subwayImg.value
+  if (!img) return
+  const rect = img.getBoundingClientRect()
+  const styles = getComputedStyle(img)
+  const bw = parseFloat(styles.borderLeftWidth) || 0
+  const w = rect.width
+
+  const baseR = w / 2 + bw + gapPx + strokeW / 2
+  subRadius.value = baseR
+  subBox.value = w + 2 * (bw + gapPx) + strokeW + pad
+
+  const dashLen = 1000 * (spanDeg / 360)
+  subDash.value = dashLen
+  subOffset.value = 1000 * (angleDeg / 360) - dashLen / 2
+  subTextStart.value = (angleDeg / 360) * 100
+
+  const cx = subBox.value / 2
+  const cy = subBox.value / 2
+  const a0 = ((angleDeg - spanDeg / 2) * Math.PI) / 180
+  const a1 = ((angleDeg + spanDeg / 2) * Math.PI) / 180
+
+  const tAngle = angleDeg + textAngleOffset.value
+  const t0 = ((tAngle - spanDeg / 2) * Math.PI) / 180
+  const t1 = ((tAngle + spanDeg / 2) * Math.PI) / 180
+  const rText = baseR - textInset.value
+
+  subTextD.value = arcD(cx, cy, rText, t0, t1)
+  subCenterPct.value = `${(tAngle / 360) * 100}%`
+}
+
+function onResize() {
+  updateBorderTag()
+}
+
+onMounted(async () => {
+  await nextTick()
+  updateBorderTag()
+  window.addEventListener('resize', onResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
+})
 </script>
 
 <style>
@@ -120,6 +224,11 @@ body {
   height: auto;
   display: block;
   margin: 0 auto 16px;
+}
+.subway-wrap,
+.carhartt-wrap {
+  position: relative;
+  display: inline-block;
 }
 
 #grad-photo,
@@ -137,8 +246,7 @@ body {
   transition: box-shadow 0.3s ease;
 }
 
-#subway-photo,
-#supervisor-photo {
+#subway-photo {
   width: 300px;
   height: 300px;
   border-radius: 50%;
@@ -151,6 +259,46 @@ body {
   cursor: pointer;
   transition: box-shadow 0.3s ease;
 }
+
+#supervisor-photo {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 5px solid black;
+  align-self: flex-start;
+  margin-right: auto;
+  transform: scaleX(-1);
+  transition: box-shadow 0.3s ease;
+}
+
+.border-tag {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.border-arc {
+  fill: none;
+  stroke: #e53935;
+  stroke-width: 28;
+  stroke-linecap: butt;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
+}
+
+.border-text {
+  fill: white;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .5px;
+}
+
+.circle-figure {
+  position: relative;
+  display: inline-block;
+}
+#subway-photo { display: block; } 
 
 #subway-photo:hover,
 #carhartt-photo:hover {
