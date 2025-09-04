@@ -24,12 +24,45 @@
     </div>
 
     <div class="subway-wrap">
-      <img
-        :src="subway"
-        alt="Sandwich Artist"
-        id="subway-photo"
-        @click="sandwichRef?.trigger()"
-      />
+      <div class="circle-figure" ref="subwayFigure">
+        <img
+          :src="subway"
+          alt="Sandwich Artist"
+          id="subway-photo"
+          ref="subwayImg"
+          @click="sandwichRef?.trigger()"
+        />
+        <svg
+          class="border-tag"
+          :viewBox="`0 0 ${subBox} ${subBox}`"
+          :style="`position:absolute;left:50%;top:50%;width:${subBox}px;height:${subBox}px;transform:translate(-50%,-50%);pointer-events:none;overflow:visible;`"
+          aria-hidden="true"
+        >
+          <defs>
+            <circle
+              :id="subPathId"
+              :cx="subBox/2"
+              :cy="subBox/2"
+              :r="subRadius"
+              pathLength="1000"
+            />
+            <path :id="subTextId" :d="subTextD" />
+          </defs>
+
+          <use
+            :href="`#${subPathId}`"
+            :xlink:href="`#${subPathId}`"
+            class="border-arc"
+            :style="`stroke-dasharray:${subDash} 1000; stroke-dashoffset:${subOffset}`"
+          />
+
+          <text class="border-text">
+            <textPath :href="`#${subTextId}`" :xlink:href="`#${subTextId}`" startOffset="50%" text-anchor="middle">
+              Click Me
+            </textPath>
+          </text>
+        </svg>
+      </div>
       <SandwichAnimation ref="sandwichRef" />
     </div>
 
@@ -44,13 +77,46 @@
     </div>
 
     <div class="carhartt-wrap">
-      <img
-        :src="carhartt"
-        alt="Carhartt"
-        id="carhartt-photo"
-        :class="{ disabled: carharttPlaying }"
-        @click="carharttPlaying ? null : carharttRef?.trigger()"
-      />
+      <div class="circle-figure">
+        <img
+          :src="carhartt"
+          alt="Carhartt"
+          id="carhartt-photo"
+          ref="carharttImg"
+          :class="{ disabled: carharttPlaying }"
+          @click="carharttPlaying ? null : carharttRef?.trigger()"
+        />
+        <svg
+          class="border-tag"
+          :viewBox="`0 0 ${carBox} ${carBox}`"
+          :style="`position:absolute;left:50%;top:50%;width:${carBox}px;height:${carBox}px;transform:translate(-50%,-50%);pointer-events:none;overflow:visible;`"
+          aria-hidden="true"
+        >
+          <defs>
+            <circle
+              :id="carPathId"
+              :cx="carBox/2"
+              :cy="carBox/2"
+              :r="carRadius"
+              pathLength="1000"
+            />
+            <path :id="carTextId" :d="carTextD" />
+          </defs>
+
+          <use
+            :href="`#${carPathId}`"
+            :xlink:href="`#${carPathId}`"
+            class="border-arc"
+            :style="`stroke-dasharray:${carDash} 1000; stroke-dashoffset:${carOffset}`"
+          />
+
+          <text class="border-text">
+            <textPath :href="`#${carTextId}`" :xlink:href="`#${carTextId}`" startOffset="50%" text-anchor="middle">
+              Click Me
+            </textPath>
+          </text>
+        </svg>
+      </div>
       <CharacterWalkAnimation
         ref="carharttRef"
         @started="carharttPlaying = true"
@@ -92,7 +158,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import gradphoto from '@/assets/gradphoto.jpeg'
 import subway from '@/assets/subway.PNG'
 import carhartt from '@/assets/carhartt.jpg'
@@ -106,12 +172,159 @@ import CharacterWalkAnimation from '@/components/CharacterWalkAnimation.vue'
 const sandwichRef = ref(null)
 const carharttRef = ref(null)
 const carharttPlaying = ref(false)
+
+const subwayFigure = ref(null)
+const subwayImg = ref(null)
+const carharttImg = ref(null)
+
+function makeBubbleState(prefix) {
+  const pathId = `${prefix}Circle-${Math.random().toString(36).slice(2)}`
+  const textId = `${prefix}Text-${Math.random().toString(36).slice(2)}`
+  return {
+    pathId,
+    textId,
+    box: ref(0),
+    radius: ref(0),
+    dash: ref(0),
+    offset: ref(0),
+    textD: ref(''),
+  }
+}
+
+const subState = makeBubbleState('sub')
+const carState = makeBubbleState('car')
+
+const {
+  pathId: subPathId,
+  textId: subTextId,
+  box: subBox,
+  radius: subRadius,
+  dash: subDash,
+  offset: subOffset,
+  textD: subTextD,
+} = subState
+
+const {
+  pathId: carPathId,
+  textId: carTextId,
+  box: carBox,
+  radius: carRadius,
+  dash: carDash,
+  offset: carOffset,
+  textD: carTextD,
+} = carState
+
+const strokeW = 28
+const pad = 12
+const textInset = ref(8)
+const textAngleOffset = ref(0)
+
+function arcD(cx, cy, R, a0, a1) {
+  const large = Math.abs(a1 - a0) > Math.PI ? 1 : 0
+  const x0 = cx + R * Math.cos(a0)
+  const y0 = cy + R * Math.sin(a0)
+  const x1 = cx + R * Math.cos(a1)
+  const y1 = cy + R * Math.sin(a1)
+  return `M ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1}`
+}
+
+function measureWidth(el) {
+  if (!el) return 0
+  const r = el.getBoundingClientRect().width
+  if (r) return r
+  const cssW = parseFloat(getComputedStyle(el).width) || 0
+  if (cssW) return cssW
+  return el.clientWidth || el.naturalWidth || 0
+}
+
+function updateBubble(imgRef, state, { angleDeg = 220, spanDeg = 40, gapPx = -5 } = {}) {
+  const img = imgRef.value
+  if (!img) return
+  const w = measureWidth(img)
+  if (!w) { scheduleRetry(); return }
+  const bw = parseFloat(getComputedStyle(img).borderLeftWidth) || 0
+  const baseR = Math.max(1, w / 2 + bw + gapPx + strokeW / 2)
+  state.radius.value = baseR
+  const boxVal = Math.max(1, w + 2 * (bw + gapPx) + strokeW + pad)
+  state.box.value = boxVal
+  const dashLen = 1000 * (spanDeg / 360)
+  state.dash.value = dashLen
+  state.offset.value = 1000 * (angleDeg / 360) - dashLen / 2
+  const cx = boxVal / 2
+  const cy = boxVal / 2
+  const tAngle = angleDeg + textAngleOffset.value
+  const a0 = ((tAngle - spanDeg / 2) * Math.PI) / 180
+  const a1 = ((tAngle + spanDeg / 2) * Math.PI) / 180
+  const rText = baseR - textInset.value
+  state.textD.value = arcD(cx, cy, rText, a0, a1)
+}
+
+const SUBWAY_CONFIG   = { angleDeg: 220, spanDeg: 40, gapPx: -5 }
+const CARHARTT_CONFIG = { angleDeg: 20,  spanDeg: 40, gapPx: -5 }
+
+const bubbleRegistry = [
+  { imgRef: subwayImg,   state: subState, config: SUBWAY_CONFIG },
+  { imgRef: carharttImg, state: carState, config: CARHARTT_CONFIG },
+]
+
+function redrawAll() {
+  for (const b of bubbleRegistry) updateBubble(b.imgRef, b.state, b.config)
+}
+
+let retryQueued = false
+function scheduleRetry() {
+  if (retryQueued) return
+  retryQueued = true
+  requestAnimationFrame(() => {
+    retryQueued = false
+    redrawAll()
+  })
+}
+
+let raf = 0
+function onResize() {
+  if (raf) return
+  raf = requestAnimationFrame(() => {
+    raf = 0
+    redrawAll()
+  })
+}
+
+let ro = null
+function wireImageLoadsAndResizeObservers() {
+  const els = [subwayImg.value, carharttImg.value].filter(Boolean)
+  for (const el of els) {
+    if (!el.complete) el.addEventListener('load', redrawAll, { once: true })
+  }
+  if ('ResizeObserver' in window) {
+    ro = new ResizeObserver(() => redrawAll())
+    els.forEach(el => ro.observe(el))
+  }
+}
+
+onMounted(async () => {
+  await nextTick()
+  wireImageLoadsAndResizeObservers()
+  requestAnimationFrame(redrawAll)
+  window.addEventListener('resize', onResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
+  if (ro) ro.disconnect()
+  if (raf) cancelAnimationFrame(raf)
+})
 </script>
 
 <style>
 body {
   margin: 0;
-  background: linear-gradient(to bottom, #3b82f6 0%, #3ba76f 100%);
+}
+</style>
+
+<style>
+body {
+  margin: 0;
 }
 </style>
 
@@ -121,6 +334,11 @@ body {
   height: auto;
   display: block;
   margin: 0 auto 16px;
+}
+.subway-wrap,
+.carhartt-wrap {
+  position: relative;
+  display: inline-block;
 }
 
 #grad-photo,
@@ -138,8 +356,7 @@ body {
   transition: box-shadow 0.3s ease;
 }
 
-#subway-photo,
-#supervisor-photo {
+#subway-photo {
   width: 300px;
   height: 300px;
   border-radius: 50%;
@@ -153,9 +370,49 @@ body {
   transition: box-shadow 0.3s ease;
 }
 
+#supervisor-photo {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 5px solid black;
+  align-self: flex-start;
+  margin-right: auto;
+  transform: scaleX(-1);
+  transition: box-shadow 0.3s ease;
+}
+
+.border-tag {
+  position: absolute;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.border-arc {
+  fill: none;
+  stroke: #e53935;
+  stroke-width: 28;
+  stroke-linecap: butt;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
+}
+
+.border-text {
+  fill: white;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .5px;
+}
+
+.circle-figure {
+  position: relative;
+  display: inline-block;
+}
+#subway-photo { display: block; } 
+
 #subway-photo:hover,
 #carhartt-photo:hover {
-  box-shadow: 0 0 30px 15px rgba(0, 191, 255, 0.9);
+  box-shadow: 0 0 30px 15px #5475eb;
 }
 
 #carhartt-photo.disabled {
@@ -208,4 +465,19 @@ body {
   display: flex;
   align-items: center;
 }
+
+.carhartt-wrap {
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.carhartt-wrap .circle-figure {
+  margin-left: auto;
+}
+
+#carhartt-photo {
+  margin-left: 0;
+  align-self: initial;
+}
 </style>
+
