@@ -51,13 +51,15 @@
 
           <use
             :href="`#${subPathId}`"
+            :xlink:href="`#${subPathId}`"
             class="border-arc"
             :style="`stroke-dasharray:${subDash} 1000; stroke-dashoffset:${subOffset}`"
           />
 
           <text class="border-text">
-            <textPath :href="`#${subTextId}`" :xlink:href="`#${subTextId}`" 
-            startOffset="50%" text-anchor="middle">Click Me</textPath>
+            <textPath :href="`#${subTextId}`" :xlink:href="`#${subTextId}`" startOffset="50%" text-anchor="middle">
+              Click Me
+            </textPath>
           </text>
         </svg>
       </div>
@@ -75,14 +77,46 @@
     </div>
 
     <div class="carhartt-wrap">
-      <img
-        :src="carhartt"
-        alt="Carhartt"
-        id="carhartt-photo"
-        :class="{ disabled: carharttPlaying }"
-        @click="carharttPlaying ? null : carharttRef?.trigger()"
-      />
-      <span v-if="!carharttPlaying" class="click-me">Click Me</span>
+      <div class="circle-figure">
+        <img
+          :src="carhartt"
+          alt="Carhartt"
+          id="carhartt-photo"
+          ref="carharttImg"
+          :class="{ disabled: carharttPlaying }"
+          @click="carharttPlaying ? null : carharttRef?.trigger()"
+        />
+        <svg
+          class="border-tag"
+          :viewBox="`0 0 ${carBox} ${carBox}`"
+          :style="`position:absolute;left:50%;top:50%;width:${carBox}px;height:${carBox}px;transform:translate(-50%,-50%);pointer-events:none;overflow:visible;`"
+          aria-hidden="true"
+        >
+          <defs>
+            <circle
+              :id="carPathId"
+              :cx="carBox/2"
+              :cy="carBox/2"
+              :r="carRadius"
+              pathLength="1000"
+            />
+            <path :id="carTextId" :d="carTextD" />
+          </defs>
+
+          <use
+            :href="`#${carPathId}`"
+            :xlink:href="`#${carPathId}`"
+            class="border-arc"
+            :style="`stroke-dasharray:${carDash} 1000; stroke-dashoffset:${carOffset}`"
+          />
+
+          <text class="border-text">
+            <textPath :href="`#${carTextId}`" :xlink:href="`#${carTextId}`" startOffset="50%" text-anchor="middle">
+              Click Me
+            </textPath>
+          </text>
+        </svg>
+      </div>
       <CharacterWalkAnimation
         ref="carharttRef"
         @started="carharttPlaying = true"
@@ -141,16 +175,44 @@ const carharttPlaying = ref(false)
 
 const subwayFigure = ref(null)
 const subwayImg = ref(null)
+const carharttImg = ref(null)
 
-const subPathId = `subCircle-${Math.random().toString(36).slice(2)}`
-const subTextId = `subText-${Math.random().toString(36).slice(2)}`
-const subBox = ref(0)
-const subRadius = ref(0)
-const subDash = ref(0)
-const subOffset = ref(0)
-const subTextStart = ref(0)
-const subTextD = ref('')
-const subCenterPct = ref('50%')
+function makeBubbleState(prefix) {
+  const pathId = `${prefix}Circle-${Math.random().toString(36).slice(2)}`
+  const textId = `${prefix}Text-${Math.random().toString(36).slice(2)}`
+  return {
+    pathId,
+    textId,
+    box: ref(0),
+    radius: ref(0),
+    dash: ref(0),
+    offset: ref(0),
+    textD: ref(''),
+  }
+}
+
+const subState = makeBubbleState('sub')
+const carState = makeBubbleState('car')
+
+const {
+  pathId: subPathId,
+  textId: subTextId,
+  box: subBox,
+  radius: subRadius,
+  dash: subDash,
+  offset: subOffset,
+  textD: subTextD,
+} = subState
+
+const {
+  pathId: carPathId,
+  textId: carTextId,
+  box: carBox,
+  radius: carRadius,
+  dash: carDash,
+  offset: carOffset,
+  textD: carTextD,
+} = carState
 
 const strokeW = 28
 const pad = 12
@@ -166,51 +228,99 @@ function arcD(cx, cy, R, a0, a1) {
   return `M ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1}`
 }
 
-function updateBorderTag(angleDeg = 220, spanDeg = 40, gapPx = -5) {
-  const img = subwayImg.value
-  if (!img) return
-  const rect = img.getBoundingClientRect()
-  const styles = getComputedStyle(img)
-  const bw = parseFloat(styles.borderLeftWidth) || 0
-  const w = rect.width
-
-  const baseR = w / 2 + bw + gapPx + strokeW / 2
-  subRadius.value = baseR
-  subBox.value = w + 2 * (bw + gapPx) + strokeW + pad
-
-  const dashLen = 1000 * (spanDeg / 360)
-  subDash.value = dashLen
-  subOffset.value = 1000 * (angleDeg / 360) - dashLen / 2
-  subTextStart.value = (angleDeg / 360) * 100
-
-  const cx = subBox.value / 2
-  const cy = subBox.value / 2
-  const a0 = ((angleDeg - spanDeg / 2) * Math.PI) / 180
-  const a1 = ((angleDeg + spanDeg / 2) * Math.PI) / 180
-
-  const tAngle = angleDeg + textAngleOffset.value
-  const t0 = ((tAngle - spanDeg / 2) * Math.PI) / 180
-  const t1 = ((tAngle + spanDeg / 2) * Math.PI) / 180
-  const rText = baseR - textInset.value
-
-  subTextD.value = arcD(cx, cy, rText, t0, t1)
-  subCenterPct.value = `${(tAngle / 360) * 100}%`
+function measureWidth(el) {
+  if (!el) return 0
+  const r = el.getBoundingClientRect().width
+  if (r) return r
+  const cssW = parseFloat(getComputedStyle(el).width) || 0
+  if (cssW) return cssW
+  return el.clientWidth || el.naturalWidth || 0
 }
 
+function updateBubble(imgRef, state, { angleDeg = 220, spanDeg = 40, gapPx = -5 } = {}) {
+  const img = imgRef.value
+  if (!img) return
+  const w = measureWidth(img)
+  if (!w) { scheduleRetry(); return }
+  const bw = parseFloat(getComputedStyle(img).borderLeftWidth) || 0
+  const baseR = Math.max(1, w / 2 + bw + gapPx + strokeW / 2)
+  state.radius.value = baseR
+  const boxVal = Math.max(1, w + 2 * (bw + gapPx) + strokeW + pad)
+  state.box.value = boxVal
+  const dashLen = 1000 * (spanDeg / 360)
+  state.dash.value = dashLen
+  state.offset.value = 1000 * (angleDeg / 360) - dashLen / 2
+  const cx = boxVal / 2
+  const cy = boxVal / 2
+  const tAngle = angleDeg + textAngleOffset.value
+  const a0 = ((tAngle - spanDeg / 2) * Math.PI) / 180
+  const a1 = ((tAngle + spanDeg / 2) * Math.PI) / 180
+  const rText = baseR - textInset.value
+  state.textD.value = arcD(cx, cy, rText, a0, a1)
+}
+
+const SUBWAY_CONFIG   = { angleDeg: 220, spanDeg: 40, gapPx: -5 }
+const CARHARTT_CONFIG = { angleDeg: 20,  spanDeg: 40, gapPx: -5 }
+
+const bubbleRegistry = [
+  { imgRef: subwayImg,   state: subState, config: SUBWAY_CONFIG },
+  { imgRef: carharttImg, state: carState, config: CARHARTT_CONFIG },
+]
+
+function redrawAll() {
+  for (const b of bubbleRegistry) updateBubble(b.imgRef, b.state, b.config)
+}
+
+let retryQueued = false
+function scheduleRetry() {
+  if (retryQueued) return
+  retryQueued = true
+  requestAnimationFrame(() => {
+    retryQueued = false
+    redrawAll()
+  })
+}
+
+let raf = 0
 function onResize() {
-  updateBorderTag()
+  if (raf) return
+  raf = requestAnimationFrame(() => {
+    raf = 0
+    redrawAll()
+  })
+}
+
+let ro = null
+function wireImageLoadsAndResizeObservers() {
+  const els = [subwayImg.value, carharttImg.value].filter(Boolean)
+  for (const el of els) {
+    if (!el.complete) el.addEventListener('load', redrawAll, { once: true })
+  }
+  if ('ResizeObserver' in window) {
+    ro = new ResizeObserver(() => redrawAll())
+    els.forEach(el => ro.observe(el))
+  }
 }
 
 onMounted(async () => {
   await nextTick()
-  updateBorderTag()
+  wireImageLoadsAndResizeObservers()
+  requestAnimationFrame(redrawAll)
   window.addEventListener('resize', onResize)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', onResize)
+  if (ro) ro.disconnect()
+  if (raf) cancelAnimationFrame(raf)
 })
 </script>
+
+<style>
+body {
+  margin: 0;
+}
+</style>
 
 <style>
 body {
@@ -355,4 +465,19 @@ body {
   display: flex;
   align-items: center;
 }
+
+.carhartt-wrap {
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.carhartt-wrap .circle-figure {
+  margin-left: auto;
+}
+
+#carhartt-photo {
+  margin-left: 0;
+  align-self: initial;
+}
 </style>
+
