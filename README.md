@@ -24,3 +24,28 @@ This site was created as both a portfolio and a way to explore layout control, a
 ## Custom Artwork/Animations
 
 The picture frames in the Experiences tab and the Home page paintings were made using ChatGPT, but all other images are mine and made by me for this project.
+
+## Getting Started
+
+### Prerequisites
+- Install [Node.js](https://nodejs.org/en/download/current)
+
+### Installation
+
+1. Clone the repository
+```bash
+   git clone https://github.com/Kait12woodard/Resume.git
+   cd Resume
+```
+
+2. Install dependencies
+```bash
+   npm install
+```
+
+3. Start the development server
+```bash
+   npm run dev
+```
+
+4. Open your browser to `http://localhost:5173`
