@@ -1,6 +1,6 @@
 # Vue Resume Portfolio
 
-This is a personal resume website built using Vue.js to showcase my experience, technical projects, and background in software development. It includes animated interactions and a stylized layout designed to reflect both professionalism and personality.
+This is a personal resume website built using Vue.js to showcase my experience, technical projects, and background in software development. It includes animated interactions and a stylized layout designed to reflect both professionalism and personality. Please check it out live [here](myportfolio-hireme-gxdhggandsbaedfy.westus2-01.azurewebsites.net).
 
 ## Features
 
